@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator HPP & Profit Pabrik Usus</title>
+    <!-- Memuat Tailwind CSS dari CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Menggunakan font family Inter yang modern dan bersih */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Style khusus untuk mencetak (print) */
+        @media print {
+            body {
+                background-color: #fff;
+                margin: 20px;
+                padding: 0;
+            }
+            /* Sembunyikan semua elemen yang tidak perlu dicetak */
+            .no-print {
+                display: none;
+            }
+            .print-container {
+                width: 100%;
+                max-width: 100%;
+                box-shadow: none;
+                border: none;
+                padding: 0;
+                margin: 0;
+            }
+            #results, #profit-section {
+                display: block !important; /* Pastikan bagian hasil terlihat */
+                margin-top: 0;
+                padding: 0;
+            }
+            .print-title {
+                display: block !important; /* Tampilkan judul cetak */
+                text-align: center;
+                font-size: 20px;
+                font-weight: bold;
+                color: #000;
+                margin-bottom: 20px;
+            }
+            /* Atur tampilan kotak hasil agar hemat tinta */
+            .print-no-bg {
+                background-color: #fff !important;
+                color: #000 !important;
+                box-shadow: none !important;
+                border: 1px solid #ccc;
+            }
+            .print-text-dark {
+                color: #000 !important;
+                opacity: 1 !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+
+    <div class="w-full max-w-3xl bg-white rounded-2xl shadow-xl p-8 transition-all print-container">
+        
+        <!-- Judul dan Deskripsi (disembunyikan saat print) -->
+        <div class="text-center mb-8 no-print">
+            <h1 class="text-3xl font-bold text-gray-800">Kalkulator HPP & Profit Pabrik Usus</h1>
+            <p class="text-gray-500 mt-2">Hitung biaya modal, analisis susut, dan estimasi profit produksi harian.</p>
+        </div>
+        
+        <!-- Judul untuk Halaman Cetak (tersembunyi normalnya) -->
+        <h2 class="text-2xl font-bold text-center text-gray-800 mb-6 hidden print-title">
+            Laporan Perhitungan HPP & Profit
+        </h2>
+
+        <!-- Form Input Data -->
+        <form id="hpp-form" class="space-y-6 no-print">
+
+            <!-- Bagian 1: Bahan Baku -->
+            <div>
+                <h2 class="text-xl font-semibold text-indigo-700 border-b border-indigo-200 pb-2 mb-4">1. Bahan Baku</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="beratKotor" class="block text-sm font-medium text-gray-700">Berat Usus Kotor (kg)</label>
+                        <input type="number" id="beratKotor" value="130" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
+                    </div>
+                    <div>
+                        <label for="hargaKotor" class="block text-sm font-medium text-gray-700">Harga Usus Kotor (per kg)</label>
+                        <input type="number" id="hargaKotor" value="1500" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
+                    </div>
+                </div>
+                <!-- Subtotal Bahan Baku -->
+                <div class="mt-4 p-3 bg-indigo-50 border border-indigo-200 rounded-lg text-right">
+                    <span class="text-sm font-medium text-gray-600">Total Biaya Bahan Baku:</span>
+                    <span id="subtotal-bahan-baku" class="text-lg font-bold text-indigo-700 ml-2">Rp 0</span>
+                </div>
+            </div>
+
+            <!-- Bagian 2: Tenaga Kerja & Hasil -->
+            <div>
+                <h2 class="text-xl font-semibold text-indigo-700 border-b border-indigo-200 pb-2 mb-4">2. Proses & Hasil Jadi</h2>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div>
+                        <label for="beratBersih" class="block text-sm font-medium text-gray-700">Berat Usus Bersih (kg)</label>
+                        <input type="number" id="beratBersih" value="95" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
+                        <p class="text-xs text-gray-500 mt-1">Status setelah dibersihkan.</p>
+                    </div>
+                    <div>
+                        <label for="beratMatang" class="block text-sm font-medium text-gray-700">Berat Usus Matang (kg)</label>
+                        <input type="number" id="beratMatang" value="58" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
+                         <p class="text-xs text-gray-500 mt-1">Untuk HPP & biaya pekerja.</p>
+                    </div>
+                     <div>
+                        <label for="biayaPekerja" class="block text-sm font-medium text-gray-700">Biaya Pekerja (per kg matang)</label>
+                        <input type="number" id="biayaPekerja" value="1800" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
+                    </div>
+                    <div>
+                        <label for="totalPekerja" class="block text-sm font-medium text-gray-700">Total Pekerja</label>
+                        <input type="number" id="totalPekerja" value="4" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
+                         <p class="text-xs text-gray-500 mt-1">Jumlah orang yg bekerja.</p>
+                    </div>
+                </div>
+                <!-- Subtotal Tenaga Kerja & Analisis Susut -->
+                <div class="mt-4 p-3 bg-indigo-50 border border-indigo-200 rounded-lg space-y-2">
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm font-medium text-gray-600">Total Biaya Tenaga Kerja:</span>
+                        <span id="subtotal-tenaga-kerja" class="text-lg font-bold text-indigo-700">Rp 0</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm font-medium text-gray-600">Gaji per Pekerja:</span>
+                        <span id="gaji-per-pekerja" class="text-lg font-bold text-gray-800">Rp 0</span>
+                    </div>
+                    <!-- Tambahan Analisis Susut -->
+                    <hr class="border-indigo-200">
+                    <div class="flex justify-between items-center text-sm" title="(Berat Kotor - Berat Bersih) / Berat Kotor">
+                        <span class="text-gray-600">% Susut Pembersihan:</span>
+                        <span id="susut-pembersihan" class="font-bold text-gray-800">0.0%</span>
+                    </div>
+                    <div class="flex justify-between items-center text-sm" title="(Berat Bersih - Berat Matang) / Berat Bersih">
+                        <span class="text-gray-600">% Susut Pemasakan:</span>
+                        <span id="susut-pemasakan" class="font-bold text-gray-800">0.0%</span>
+                    </div>
+                    <div class="flex justify-between items-center text-sm" title="(Berat Matang / Berat Kotor)">
+                        <span class="text-gray-600 font-medium">% Yield (Hasil) Akhir:</span>
+                        <span id="yield-akhir" class="font-bold text-indigo-700">0.0%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bagian 3: Biaya Operasional Harian -->
+            <div>
+                <h2 class="text-xl font-semibold text-indigo-700 border-b border-indigo-200 pb-2 mb-4">3. Biaya Operasional Harian</h2>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <!-- Biaya Tetap -->
+                    <div>
+                        <label for="sewaMobil" class="block text-sm font-medium text-gray-700">Sewa Mobil</label>
+                        <input type="number" id="sewaMobil" value="120000" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
+                    </div>
+                    <div>
+                        <label for="bensin" class="block text-sm font-medium text-gray-700">Bensin</label>
+                        <input type="number" id="bensin" value="100000" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
+                    </div>
+                    <div>
+                        <label for="gasMasak" class="block text-sm font-medium text-gray-700">Gas Memasak</label>
+                        <input type="number" id="gasMasak" value="37500" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
+                    </div>
+                    <div>
+                        <label for="listrik" class="block text-sm font-medium text-gray-700">Listrik</label>
+                        <input type="number" id="listrik" value="20000" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
+                    </div>
+                    <div>
+                        <label for="biayaLain" class="block text-sm font-medium text-gray-700">Biaya Lain (Tetap)</label>
+                        <input type="number" id="biayaLain" value="0" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
+                    </div>
+                    
+                    <!-- Biaya Variabel -->
+                    <div>
+                        <label for="biayaKemasan" class="block text-sm font-medium text-gray-700">Kemasan (per kg matang)</label>
+                        <input type="number" id="biayaKemasan" value="0" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
+                    </div>
+                    <div>
+                        <label for="biayaBumbu" class="block text-sm font-medium text-gray-700">Bumbu (per kg matang)</label>
+                        <input type="number" id="biayaBumbu" value="0" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
+                    </div>
+                </div>
+                <!-- Subtotal Operasional -->
+                <div class="mt-4 p-3 bg-indigo-50 border border-indigo-200 rounded-lg text-right">
+                    <span class="text-sm font-medium text-gray-600">Total Biaya Operasional:</span>
+                    <span id="subtotal-operasional" class="text-lg font-bold text-indigo-700 ml-2">Rp 0</span>
+                </div>
+            </div>
+
+            <!-- Tombol Aksi -->
+            <div class="pt-4 grid grid-cols-1 md:grid-cols-2 gap-4 no-print">
+                <button type="button" id="btn-reset" class="w-full bg-gray-500 text-white font-bold text-lg py-3 px-6 rounded-lg shadow-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200">
+                    Reset
+                </button>
+                <button type="submit" class="w-full bg-indigo-600 text-white font-bold text-lg py-3 px-6 rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all duration-200">
+                    Hitung HPP
+                </button>
+            </div>
+        </form>
+
+        <!-- Bagian Hasil Perhitungan (Awalnya tersembunyi) -->
+        <div id="results" class="hidden mt-10">
+            <!-- Tombol Cetak (hanya muncul saat hasil ada) -->
+            <!-- <div class="text-right mb-4 no-print">
+                <button id="btn-cetak" class="bg-green-600 text-white font-bold py-2 px-4 rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-200">
+                    Cetak Laporan
+                </button>
+            </div> -->
+
+            <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Hasil Perhitungan HPP</h2>
+            
+            <!-- Rincian Biaya -->
+            <div class="bg-indigo-50 rounded-lg p-6 space-y-3 print-no-bg">
+                <div class="flex justify-between items-center text-lg">
+                    <span class="text-gray-600">Total Biaya Bahan Baku</span>
+                    <span id="res-bahan-baku" class="font-semibold text-gray-800">Rp 0</span>
+                </div>
+                <div class="flex justify-between items-center text-lg">
+                    <span class="text-gray-600">Total Biaya Tenaga Kerja</span>
+                    <span id="res-tenaga-kerja" class="font-semibold text-gray-800">Rp 0</span>
+                </div>
+                <div class="flex justify-between items-center text-lg">
+                    <span class="text-gray-600">Total Biaya Operasional</span>
+                    <span id="res-overhead" class="font-semibold text-gray-800">Rp 0</span>
+                </div>
+                
+                <hr class="border-gray-300 border-dashed my-3">
+
+                <div class="flex justify-between items-center text-xl">
+                    <span class="font-bold text-gray-700">Total Biaya Produksi</span>
+                    <span id="res-total-biaya" class="font-bold text-indigo-700">Rp 0</span>
+                </div>
+            </div>
+
+            <!-- Hasil HPP Final -->
+            <div class="mt-6 bg-indigo-600 text-white rounded-lg p-6 text-center shadow-lg print-no-bg">
+                <h3 class="text-xl font-medium opacity-90 print-text-dark">HPP per kg (Usus Matang)</h3>
+                <p id="res-hpp-calculation" class="text-sm opacity-80 mt-2 mb-1 print-text-dark">(Perhitungan: Total Biaya / Berat Matang)</p>
+                <p id="res-hpp-per-kg" class="text-4xl font-bold mt-1 print-text-dark">Rp 0,00</p>
+            </div>
+        </div>
+
+        <!-- Bagian Profit (Awalnya tersembunyi) -->
+        <div id="profit-section" class="hidden mt-8">
+            <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Kalkulator Estimasi Profit</h2>
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <!-- Input Harga Jual (disembunyikan saat print) -->
+                <div class="mb-4 no-print">
+                    <label for="hargaJual" class="block text-sm font-medium text-gray-700">Masukkan Harga Jual Anda (per kg)</label>
+                    <input type="number" id="hargaJual" placeholder="Contoh: 15000" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                </div>
+                <!-- Hasil Profit -->
+                <div class="bg-indigo-50 rounded-lg p-6 space-y-3 print-no-bg">
+                    <div class="flex justify-between items-center text-lg">
+                        <span class="text-gray-600">Profit per kg</span>
+                        <span id="res-profit-per-kg" class="font-semibold text-green-700">Rp 0</span>
+                    </div>
+                    <div class="flex justify-between items-center text-lg">
+                        <span class="text-gray-600">Margin Profit</span>
+                        <span id="res-margin-profit" class="font-semibold text-green-700">0.0%</span>
+                    </div>
+                    <hr class="border-indigo-200 border-dashed my-3">
+                    <div class="flex justify-between items-center text-xl">
+                        <span class="font-bold text-gray-700">Total Estimasi Profit</span>
+                        <span id="res-total-profit" class="font-bold text-green-700">Rp 0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Variabel global untuk menyimpan HPP per kg (untuk kalkulator profit)
+        let globalHppPerKg = 0;
+
+        // Fungsi untuk memformat angka menjadi format mata uang Rupiah
+        function formatRupiah(angka, prefix = 'Rp ', desimal = 0) {
+            const roundedAngka = Math.round(angka * Math.pow(10, desimal)) / Math.pow(10, desimal);
+
+            let number_string = roundedAngka.toString(),
+                parts = number_string.split('.'),
+                integerPart = parts[0],
+                decimalPart = parts.length > 1 ? parts[1] : '';
+
+            let sisa = integerPart.length % 3,
+                rupiah = integerPart.substr(0, sisa),
+                ribuan = integerPart.substr(sisa).match(/\d{3}/gi);
+
+            if (ribuan) {
+                let separator = sisa ? '.' : '';
+                rupiah += separator + ribuan.join('.');
+            }
+
+            if (desimal > 0) {
+                decimalPart = decimalPart.padEnd(desimal, '0');
+                rupiah += ',' + decimalPart;
+            }
+
+            return prefix + rupiah;
+        }
+
+        // Fungsi untuk memformat angka menjadi persentase
+        function formatPersen(angka, desimal = 1) {
+            return angka.toFixed(desimal).replace('.', ',') + '%';
+        }
+
+        // Fungsi untuk menghitung semua nilai
+        function hitungOtomatis() {
+            // 1. Mengambil semua nilai dari input
+            const beratKotor = parseFloat(document.getElementById('beratKotor').value) || 0;
+            const hargaKotor = parseFloat(document.getElementById('hargaKotor').value) || 0;
+            const beratBersih = parseFloat(document.getElementById('beratBersih').value) || 0;
+            const biayaPekerja = parseFloat(document.getElementById('biayaPekerja').value) || 0;
+            const beratMatang = parseFloat(document.getElementById('beratMatang').value) || 0;
+            const totalPekerja = parseFloat(document.getElementById('totalPekerja').value) || 0;
+            
+            // Biaya Operasional
+            const sewaMobil = parseFloat(document.getElementById('sewaMobil').value) || 0;
+            const bensin = parseFloat(document.getElementById('bensin').value) || 0;
+            const gasMasak = parseFloat(document.getElementById('gasMasak').value) || 0;
+            const listrik = parseFloat(document.getElementById('listrik').value) || 0;
+            const biayaLain = parseFloat(document.getElementById('biayaLain').value) || 0;
+            const biayaKemasan = parseFloat(document.getElementById('biayaKemasan').value) || 0;
+            const biayaBumbu = parseFloat(document.getElementById('biayaBumbu').value) || 0;
+
+            // 2. Melakukan Perhitungan
+            // Bagian 1
+            const totalBahanBaku = beratKotor * hargaKotor;
+            
+            // Bagian 2
+            const totalTenagaKerja = beratMatang * biayaPekerja;
+            let gajiPerPekerja = 0;
+            if (totalPekerja > 0) {
+                gajiPerPekerja = totalTenagaKerja / totalPekerja;
+            }
+            
+            // Analisis Susut
+            let susutPembersihan = 0;
+            if (beratKotor > 0) {
+                susutPembersihan = ((beratKotor - beratBersih) / beratKotor) * 100;
+            }
+            let susutPemasakan = 0;
+            if (beratBersih > 0) {
+                susutPemasakan = ((beratBersih - beratMatang) / beratBersih) * 100;
+            }
+            let yieldAkhir = 0;
+            if (beratKotor > 0) {
+                yieldAkhir = (beratMatang / beratKotor) * 100;
+            }
+
+            // Bagian 3
+            const totalOverheadTetap = sewaMobil + bensin + gasMasak + listrik + biayaLain;
+            const totalBiayaVariabel = (biayaKemasan * beratMatang) + (biayaBumbu * beratMatang);
+            const totalOverhead = totalOverheadTetap + totalBiayaVariabel;
+
+            // Total Biaya
+            const totalBiayaProduksi = totalBahanBaku + totalTenagaKerja + totalOverhead;
+            
+            // HPP per KG
+            let hppPerKg = 0;
+            if (beratMatang > 0) {
+                hppPerKg = totalBiayaProduksi / beratMatang;
+            }
+            globalHppPerKg = hppPerKg; // Simpan ke variabel global
+
+            // 3. Menampilkan Hasil Subtotal di Form
+            document.getElementById('subtotal-bahan-baku').textContent = formatRupiah(totalBahanBaku);
+            document.getElementById('subtotal-tenaga-kerja').textContent = formatRupiah(totalTenagaKerja);
+            document.getElementById('gaji-per-pekerja').textContent = formatRupiah(gajiPerPekerja);
+            document.getElementById('susut-pembersihan').textContent = formatPersen(susutPembersihan);
+            document.getElementById('susut-pemasakan').textContent = formatPersen(susutPemasakan);
+            document.getElementById('yield-akhir').textContent = formatPersen(yieldAkhir);
+            document.getElementById('subtotal-operasional').textContent = formatRupiah(totalOverhead);
+
+            // 4. Menampilkan Hasil di Blok Bawah
+            document.getElementById('res-bahan-baku').textContent = formatRupiah(totalBahanBaku);
+            document.getElementById('res-tenaga-kerja').textContent = formatRupiah(totalTenagaKerja);
+            document.getElementById('res-overhead').textContent = formatRupiah(totalOverhead);
+            document.getElementById('res-total-biaya').textContent = formatRupiah(totalBiayaProduksi);
+            
+            document.getElementById('res-hpp-calculation').textContent = 
+                `(${formatRupiah(totalBiayaProduksi)} / ${beratMatang} kg)`;
+            document.getElementById('res-hpp-per-kg').textContent = formatRupiah(hppPerKg, 'Rp ', 2);
+
+            // 5. Update kalkulator profit juga
+            hitungProfit();
+        }
+
+        // Fungsi untuk menghitung profit
+        function hitungProfit() {
+            const hargaJual = parseFloat(document.getElementById('hargaJual').value) || 0;
+            const beratMatang = parseFloat(document.getElementById('beratMatang').value) || 0; // Ambil lagi berat matang
+            
+            const profitPerKg = hargaJual - globalHppPerKg;
+            const marginProfit = (hargaJual > 0) ? (profitPerKg / hargaJual) * 100 : 0;
+            const totalProfit = profitPerKg * beratMatang;
+
+            document.getElementById('res-profit-per-kg').textContent = formatRupiah(profitPerKg);
+            document.getElementById('res-margin-profit').textContent = formatPersen(marginProfit);
+            document.getElementById('res-total-profit').textContent = formatRupiah(totalProfit, 'Rp ', 0);
+        }
+
+        // Fungsi untuk mereset form
+        function resetForm() {
+            document.getElementById('hpp-form').reset(); // Reset semua input di form
+            document.getElementById('hargaJual').value = ''; // Reset input harga jual (di luar form)
+            
+            document.getElementById('results').classList.add('hidden'); // Sembunyikan hasil HPP
+            document.getElementById('profit-section').classList.add('hidden'); // Sembunyikan hasil profit
+            
+            hitungOtomatis(); // Hitung ulang untuk reset subtotal ke nilai default
+        }
+
+        // Fungsi untuk mencetak
+        function cetakLaporan() {
+            window.print();
+        }
+
+
+        // Menambahkan event listener ke form
+        document.getElementById('hpp-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            hitungOtomatis();
+            document.getElementById('results').classList.remove('hidden');
+            document.getElementById('profit-section').classList.remove('hidden');
+        });
+
+        // Menambahkan event listener ke semua input untuk auto-calculate
+        const inputs = document.querySelectorAll('#hpp-form input[type="number"]');
+        inputs.forEach(input => {
+            input.addEventListener('input', hitungOtomatis);
+        });
+
+        // Listener untuk input harga jual
+        document.getElementById('hargaJual').addEventListener('input', hitungProfit);
+
+        // Listener untuk tombol Reset dan Cetak
+        document.getElementById('btn-reset').addEventListener('click', resetForm);
+        document.getElementById('btn-cetak').addEventListener('click', cetakLaporan);
+
+        // Hitung pertama kali saat halaman dimuat (untuk mengisi subtotal dari nilai default)
+        document.addEventListener('DOMContentLoaded', hitungOtomatis);
+    </script>
+
+</body>
+</html>
